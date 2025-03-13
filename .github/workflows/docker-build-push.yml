@@ -37,13 +37,28 @@ jobs:
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      # Define Docker Image Tag based on GitHub SHA
+      - name: Set Docker Image Tag
+        run: echo "IMAGE_TAG=$(date +%Y%m%d%H%M%S)" >> $GITHUB_ENV
 
-      # Build Docker image
+      # Build Docker image with version tag and latest tag
       - name: Build Docker Image
         run: |
-          docker build -t divyapilla75/shortened-url:latest .
+          docker build -t divyapilla75/shortened-url:${{ env.IMAGE_TAG }} .
+          docker tag divyapilla75/shortened-url:${{ env.IMAGE_TAG }} divyapilla75/shortened-url:latest
 
-      # Push Docker image to Docker Hub
+      # Push Docker image to Docker Hub (both versioned and latest)
       - name: Push Docker Image
         run: |
+          docker push divyapilla75/shortened-url:${{ env.IMAGE_TAG }}
           docker push divyapilla75/shortened-url:latest
+
+      # # Build Docker image
+      # - name: Build Docker Image
+      #   run: |
+      #     docker build -t divyapilla75/shortened-url:latest .
+
+      # # Push Docker image to Docker Hub
+      # - name: Push Docker Image
+      #   run: |
+      #     docker push divyapilla75/shortened-url:latest
